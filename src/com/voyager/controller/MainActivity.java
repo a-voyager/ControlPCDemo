@@ -27,7 +27,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	/**
 	 * 服务端端口
 	 */
-	public static final int PORT = 3000;
+	public static final int PORT = 30000;
 	/**
 	 * handler查找失败
 	 */
@@ -87,11 +87,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
 			case 1000:
-				Toast.makeText(MainActivity.this, "找到服务端", 0);
+				Toast.makeText(MainActivity.this, "找到服务端", 0).show();
+				pd_main.setVisibility(View.INVISIBLE);
 				break;
 
 			case -1000:
-				Toast.makeText(MainActivity.this, "未找到服务端", 0);
+				Toast.makeText(MainActivity.this, "未找到服务端", 0).show();
+				pd_main.setVisibility(View.INVISIBLE);
 				break;
 			default:
 				pd_main.setProgress(msg.what);
@@ -115,19 +117,19 @@ public class MainActivity extends Activity implements OnClickListener {
 				try {
 					socket.connect(inetSocketAddress, TIMEOUT);
 					socket.close();
+					flag = true;
 					Message message = new Message();
 					message.what = SUCCEED;
 					message.obj = serverIp + i;
 					handler.sendMessage(message);
-					flag = true;
 					break;
 				} catch (Exception e) {
-					Log.e("ScanThread", "Scan Error:" + serverIp + i);
+					Log.w("ScanThread", "Scan :" + serverIp + i);
 					handler.sendEmptyMessage(i);
 				}
-				if (!flag) {
-					handler.sendEmptyMessage(FAILED);
-				}
+			}
+			if (!flag) {
+				handler.sendEmptyMessage(FAILED);
 			}
 			super.run();
 		}

@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
         <EditText
@@ -26,7 +26,11 @@
 
     <ProgressBar
         android:id="@+id/pd_main"
+        style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
-    
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dip"
+        android:layout_marginRight="15dip"
+        android:layout_marginTop="30dip" />
+
 </LinearLayout>
