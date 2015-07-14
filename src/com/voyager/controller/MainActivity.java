@@ -73,11 +73,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		pd_main.setMax(MAX_IP);
 
 		wifiUtils = new WifiUtils(MainActivity.this);
+		new ScanThread().start();
 	}
 
 	@Override
 	public void onClick(View v) {
-		new ScanThread().start();
 	}
 
 	/**
