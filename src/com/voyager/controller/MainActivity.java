@@ -63,6 +63,10 @@ public class MainActivity extends Activity implements OnClickListener {
 	 * 最大搜索ip
 	 */
 	private static final int MAX_IP = 256;
+	/**
+	 * 找到的服务器IP地址
+	 */
+	private String availableIp;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -81,20 +85,35 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.btn_send:
+			String command = et_command.getText().toString().trim();
+			if (connThread != null) {
+				connThread.interrupt();
+			}
+			connThread = new ConnThread(availableIp, PORT, command);
+			connThread.start();
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	/**
 	 * handler处理消息
 	 */
 	private Handler handler = new Handler() {
+
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
-			case 1000:
+			case SUCCEED:
+				availableIp = (String) msg.obj;
 				Toast.makeText(MainActivity.this, "找到服务端", 0).show();
 				pd_main.setVisibility(View.INVISIBLE);
 				break;
 
-			case -1000:
+			case FAILED:
 				Toast.makeText(MainActivity.this, "未找到服务端", 0).show();
 				pd_main.setVisibility(View.INVISIBLE);
 				break;
@@ -104,6 +123,10 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		};
 	};
+	/**
+	 * 连接进程
+	 */
+	private ConnThread connThread = null;
 
 	/**
 	 * 搜索进程
