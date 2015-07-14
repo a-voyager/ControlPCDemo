@@ -1,8 +1,11 @@
 package com.voyager.controller;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -102,6 +105,12 @@ public class MainActivity extends Activity implements OnClickListener {
 		};
 	};
 
+	/**
+	 * 搜索进程
+	 * 
+	 * @author wuhaojie
+	 *
+	 */
 	private class ScanThread extends Thread {
 
 		@Override
@@ -130,6 +139,89 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 			if (!flag) {
 				handler.sendEmptyMessage(FAILED);
+			}
+			super.run();
+		}
+	}
+
+	/**
+	 * 连接服务器端类
+	 * 
+	 * @author wuhaojie
+	 *
+	 */
+	private class ConnThread extends Thread {
+		private static final int RECIEVED = 2000;
+		/**
+		 * 连接IP地址
+		 */
+		private String ip;
+		/**
+		 * 连接端口
+		 */
+		private int port;
+		/**
+		 * 内容
+		 */
+		private String content;
+		/**
+		 * 客户端socket通信
+		 */
+		private Socket socket;
+		/**
+		 * 客户端数据输入流
+		 */
+		private DataInputStream dataInputStream;
+		/**
+		 * 客户端数据输出流
+		 */
+		private DataOutputStream dataOutputStream;
+
+		public ConnThread(String ip, int port, String content) {
+			super();
+			this.ip = ip;
+			this.port = port;
+			this.content = content;
+		}
+
+		@Override
+		public void run() {
+			try {
+				socket = new Socket(ip, port);
+				while (true) {
+					dataOutputStream = new DataOutputStream(
+							socket.getOutputStream());
+					dataInputStream = new DataInputStream(
+							socket.getInputStream());
+					String inputMsg = "";
+					if ((dataOutputStream != null) && !(content.isEmpty())) {
+						dataOutputStream.writeUTF(content);
+					}
+					inputMsg = dataInputStream.readUTF();
+					System.out.println("服务器返回的信息：" + inputMsg);
+					if (!inputMsg.isEmpty()) {
+						Message message = new Message();
+						message.what = RECIEVED;
+						message.obj = inputMsg;
+						handler.sendMessage(message);
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					if (dataInputStream != null) {
+						dataInputStream.close();
+					}
+					if (dataOutputStream != null) {
+						dataOutputStream.close();
+					}
+					if (socket != null) {
+						socket = null;
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			super.run();
 		}
