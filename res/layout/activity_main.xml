@@ -24,4 +24,9 @@
             android:text="发送" />
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/pd_main"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+    
 </LinearLayout>
